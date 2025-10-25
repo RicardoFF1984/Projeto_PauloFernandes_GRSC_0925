@@ -62,6 +62,9 @@ zone "0.0.10.in-addr.arpa" IN {
 sudo /etc/sysconfig/named// Edit this file to set BIND options
 OPTIONS="-4" // Configure BIND to use only IPv4
 
+// Start and enable BIND service
+
+
 
 
 
