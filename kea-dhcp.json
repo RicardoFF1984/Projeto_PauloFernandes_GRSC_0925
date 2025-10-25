@@ -5,6 +5,7 @@
 // │ Purpose: Assign IPs in 10.0.0.0/24 with DNS and gateway    │
 // │          options for local network clients                 │
 // └────────────────────────────────────────────────────────────┘
+sudo dnf -y install kea
 
 {
   "Dhcp4": {
