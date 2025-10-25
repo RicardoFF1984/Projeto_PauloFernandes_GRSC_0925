@@ -5,7 +5,7 @@
 // │ Purpose: Configure BIND to serve DNS                       │
 // └────────────────────────────────────────────────────────────┘
 
-sudo dnf -y install bind bind-utils // Install BIND DNS server
+//sudo dnf -y install bind bind-utils // Install BIND DNS server
 
 acl internal-network {
     10.0.0.0/24;

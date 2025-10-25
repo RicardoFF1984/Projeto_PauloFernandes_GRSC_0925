@@ -1,0 +1,83 @@
+// ┌────────────────────────────────────────────────────────────┐
+// │ Kea DHCPv4 Configuration                                   │
+// │ Author: Paulo Fernandes                                    │
+// │ Date: 2025-03-12                                           │
+// │ Purpose: Assign IPs in 10.0.0.0/24 with DNS and gateway    │
+// │          options for local network clients                 │
+// └────────────────────────────────────────────────────────────┘
+sudo dnf -y install kea
+
+{
+  "Dhcp4": {
+    "interfaces-config": {
+      "interfaces": [ "ens160" ] // Listen on this interface
+    },
+
+    "expired-leases-processing": {
+      "reclaim-timer-wait-time": 10,
+      "flush-reclaimed-timer-wait-time": 25,
+      "hold-reclaimed-time": 3600,
+      "max-reclaim-leases": 100,
+      "max-reclaim-time": 250,
+      "unwarned-reclaim-cycles": 5
+    },
+
+    "renew-timer": 900,         // T1: Client starts renewal
+    "rebind-timer": 1800,       // T2: Client starts rebind
+    "valid-lifetime": 3600,     // Lease duration
+
+    "option-data": [
+      {
+        "name": "domain-name-servers",
+        "data": "8.8.8.8"       // DNS server
+      },
+      {
+        "name": "domain-name",
+        "data": "grsc.local"     // Domain name
+      },
+      {
+        "name": "domain-search",
+        "data": "grsc.local"     // Search domain
+      }
+    ],
+
+    "subnet4": [
+      {
+        "id": 1,
+        "subnet": "10.0.0.0/24", // Target subnet
+        "pools": [
+          { "pool": "10.0.0.200 - 10.0.0.254" } // IP range
+        ],
+        "option-data": [
+          {
+            "name": "routers",
+            "data": "10.0.0.1"   // Default gateway
+          }
+        ]
+      }
+    ],
+
+    "loggers": [
+      {
+        "name": "kea-dhcp4",
+        "output-options": [
+          {
+            "output": "/var/log/kea/kea-dhcp4.log"
+          }
+        ],
+        "severity": "INFO",
+        "debuglevel": 0
+      }
+    ]
+  }
+}
+
+sudo chown root:kea /etc/kea/kea-dhcp4.conf
+sudo chmod 640 /etc/kea/kea-dhcp4.conf
+sudo systemctl enable --now kea-dhcp4
+
+
+sudo firewall-cmd --add-service=dhcp
+sudo firewall-cmd --runtime-to-permanent
+
+sudo cat /var/lib/kea/kea-leases4.csv
